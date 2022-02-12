@@ -6,7 +6,9 @@ if [ $# -lt 1 ]; then
 fi
 
 case "$1" in
-    phone_name) bt_address=ff:ff:ff:ff:ff:ff; bt_channel=1;;
+    phone_name_1) bt_address=ff:ff:ff:ff:ff:ff; bt_channel=1;;
+    phone_name_2) bt_address=ee:ee:aa:aa:ee:ee; bt_channel=6;;
+    phone_name_3) bt_address=12:34:56:78:90:aa; bt_channel=5;;
 esac
 
 # to find the data above: hcitool scan -> bt_address
