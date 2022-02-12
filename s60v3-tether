@@ -1,0 +1,36 @@
+#!/bin/bash
+# fizolas 2022
+
+if [ $# -lt 1 ]; then 
+    echo "Give a phone name as the input parameter"; exit; 
+fi
+
+case "$1" in
+    phone_name) bt_address=ff:ff:ff:ff:ff:ff; bt_channel=1;;
+esac
+
+# to find the data above: hcitool scan -> bt_address
+#                         sdptool browse bt_address -> bt_channel
+
+# trap ctrl-c by calling ctrl_c()
+trap ctrl_c INT
+
+# exit tasks (when leaving wvdial through ctrl-C)
+function ctrl_c() {
+    echo "Releasing rfcomm"
+    sudo rfcomm release 0 # we only bind 0 but we can also do "release all"
+    echo "Reactivating network manager"
+    sudo service NetworkManager start
+    echo "Shutting down bluetooth"
+    sudo rfkill block bluetooth # bt off
+}
+
+echo "Shutting down network manager"
+sudo service NetworkManager stop
+echo "Activating bluetooth"
+sudo rfkill unblock bluetooth # bt on, in case it is not
+echo "Binding rfcomm"
+sudo rfcomm bind 0 "$bt_address" "$bt_channel"
+sleep 2 # without this wvdial fails...
+echo "Connecting to $1 ($bt_address/$bt_channel)"
+wvdial bluetooth
