@@ -5,7 +5,7 @@ Put wvdial.conf in /etc, replace "data.provider.com" with the IP of your own int
 
 Put s60v3-tether script in ~/bin or some other directory in the path, and make it executable (chmod +x)
 
-Put yourself in the sudoers group: e.g. for user john: "usermod -aG sudo john" 
+Put yourself in the sudoers group: e.g. for user john: "usermod -aG sudo john" (for this to be effective you need to log out and log in again)
 
 Pair your phone(s) with your computer; give access permission to the computer from the phone(s) in the bluetooth menu
 
