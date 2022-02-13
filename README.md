@@ -13,6 +13,6 @@ Run "s60v3-tether phone_name" to tether the phone with bluetooth name "phone_nam
 
 Ctrl-C stops the tethering session leaving the system consistent (both during dial-up channel search or during wvdial)
 
-Tethering works well with three different phones I've tried (E63, E52, E72), although the connection sometimes drops with the E63 (s60v3 FP2)
+Tethering works well with three different phones I've tried (E63, E52, E72), although the connection sometimes drops with the E63 (s60v3 FP1)
 
 Note: for the Evolution email client to work during tethering, set "Method to detect online state" to "base" in "Settings>Network Preferences" 
