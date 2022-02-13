@@ -25,11 +25,11 @@ echo "Getting bluetooth address of phone"
 tmp=$(bluetoothctl paired-devices|grep $1)
 tmp=${tmp#Device }
 bt_address=${tmp%" $1"}
-echo "Getting dial-up channel" # we get it dynamically as sometimes it "magically" changes
+echo "Getting dial-up channel"
 bt_channel=""
 while [ "$bt_channel" == "" ]; do
     tmp=$(sdptool search --bdaddr "$bt_address" DUN|grep Channel) 
-    bt_channel=${tmp#*: } # gets everything after ": " -> dial-up network channel
+    bt_channel=${tmp#*: } 
 done
 echo "Binding rfcomm"
 sudo rfcomm bind 0 "$bt_address" "$bt_channel"
