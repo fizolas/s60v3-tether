@@ -1,37 +1,51 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]; then 
-    echo "Give bluetooth name of the (paired) phone you wish to tether"; exit; 
+    echo "Give as a parameter the bluetooth name of the (paired) phone you wish to tether"; exit 
 fi
 
-# trap ctrl-c by calling ctrl_c()
-trap ctrl_c INT
 
-# exit tasks (when leaving wvdial through ctrl-C)
+# exit tasks (when leaving through ctrl-C in wvdial)
 function ctrl_c() {
-    echo "Releasing rfcomm"
-    sudo rfcomm release 0 # we only bind 0 but we can also do "release all"
-    echo "Reactivating network manager"
+    echo "Releasing rfcomm 0"
+    sudo rfcomm release 0 
+    echo "Restarting NetworkManager"
     sudo service NetworkManager start
-    echo "Shutting down bluetooth"
-    sudo rfkill block bluetooth # bt off
+    echo "Deactivating bluetooth"
+    sudo rfkill block bluetooth 
+    exit
 }
 
-echo "Shutting down network manager"
+# exit tasks (when leaving through ctrl-C when looking for channel)
+function ctrl_c0() {
+    echo ""
+    echo "Restarting NetworkManager"
+    sudo service NetworkManager start
+    echo "Deactivating bluetooth"
+    sudo rfkill block bluetooth 
+    exit
+}
+
+
+echo "Stopping NetworkManager"
 sudo service NetworkManager stop
-echo "Activating bluetooth"
-sudo rfkill unblock bluetooth # bt on, in case it is not
-echo "Getting bluetooth address of phone"
+echo -n "Getting bluetooth address of $1: "
 tmp=$(bluetoothctl paired-devices|grep $1)
 tmp=${tmp#Device }
 bt_address=${tmp%" $1"}
-echo "Getting dial-up channel"
+echo $bt_address
+trap ctrl_c0 SIGINT
+echo "Activating bluetooth"
+sudo rfkill unblock bluetooth 
+echo -n "Getting dial-up channel: " 
 bt_channel=""
 while [ "$bt_channel" == "" ]; do
     tmp=$(sdptool search --bdaddr "$bt_address" DUN|grep Channel) 
     bt_channel=${tmp#*: } 
 done
-echo "Binding rfcomm"
+echo $bt_channel
+echo "Binding rfcomm 0 to $bt_address/$bt_channel"
 sudo rfcomm bind 0 "$bt_address" "$bt_channel"
-echo "Tethering $1 ($bt_address/$bt_channel)"
+echo "Tethering $1"
+trap ctrl_c SIGINT
 wvdial bluetooth
