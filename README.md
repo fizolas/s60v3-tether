@@ -11,7 +11,7 @@ Pair your phone with your computer; set the computer as "authorised" in the blue
 
 Run "s60v3-tether phone_name" to tether the phone with bluetooth name "phone_name"
 
-Ctrl-C stops the tethering session and restarts Network Manager (it needs to be stopped for wvdial to work)
+Ctrl-C stops the tethering session leaving the system consistent (both during dial-up channel search or during wvdial)
 
 Tethering works well with three different phones I've tried (E63, E52, E72), although the connection sometimes drops with the E63 (s60v3 FP2)
 
