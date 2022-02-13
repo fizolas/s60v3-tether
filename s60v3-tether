@@ -1,18 +1,8 @@
 #!/bin/bash
-# fizolas 2022
 
 if [ $# -lt 1 ]; then 
-    echo "Give a phone name as the input parameter"; exit; 
+    echo "Give bluetooth name of the (paired) phone you wish to tether"; exit; 
 fi
-
-case "$1" in
-    phone_name_1) bt_address=ff:ff:ff:ff:ff:ff; bt_channel=1;;
-    phone_name_2) bt_address=ee:ee:aa:aa:ee:ee; bt_channel=6;;
-    phone_name_3) bt_address=12:34:56:78:90:aa; bt_channel=5;;
-esac
-
-# to find the data above: hcitool scan -> bt_address
-#                         sdptool browse bt_address -> bt_channel
 
 # trap ctrl-c by calling ctrl_c()
 trap ctrl_c INT
@@ -31,8 +21,17 @@ echo "Shutting down network manager"
 sudo service NetworkManager stop
 echo "Activating bluetooth"
 sudo rfkill unblock bluetooth # bt on, in case it is not
+echo "Getting bluetooth address of phone"
+tmp=$(bluetoothctl paired-devices|grep $1)
+tmp=${tmp#Device }
+bt_address=${tmp%" $1"}
+echo "Getting dial-up channel" # we get it dynamically as sometimes it "magically" changes
+bt_channel=""
+while [ "$bt_channel" == "" ]; do
+    tmp=$(sdptool search --bdaddr "$bt_address" DUN|grep Channel) 
+    bt_channel=${tmp#*: } # gets everything after ": " -> dial-up network channel
+done
 echo "Binding rfcomm"
 sudo rfcomm bind 0 "$bt_address" "$bt_channel"
-sleep 2 # without this wvdial fails...
-echo "Connecting to $1 ($bt_address/$bt_channel)"
+echo "Tethering $1 ($bt_address/$bt_channel)"
 wvdial bluetooth
