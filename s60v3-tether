@@ -4,25 +4,28 @@ if [ $# -lt 1 ]; then
     echo "Give as a parameter the bluetooth name of the (paired) phone you wish to tether"; exit 
 fi
 
+function deactivate_bt() {
+    tmp=$(ls /dev/rfcomm1 2> /dev/null);
+    if [ -z "$tmp" ]; then
+	echo "Deactivating bluetooth"
+	sudo rfkill block bluetooth
+    fi
+}
 
-# exit tasks (when leaving through ctrl-C in wvdial)
 function ctrl_c() {
     echo "Releasing rfcomm 0"
     sudo rfcomm release 0 
     echo "Restarting NetworkManager"
     sudo service NetworkManager start
-    echo "Deactivating bluetooth"
-    sudo rfkill block bluetooth 
+    deactivate_bt
     exit
 }
 
-# exit tasks (when leaving through ctrl-C when looking for channel)
 function ctrl_c0() {
     echo ""
     echo "Restarting NetworkManager"
     sudo service NetworkManager start
-    echo "Deactivating bluetooth"
-    sudo rfkill block bluetooth 
+    deactivate_bt
     exit
 }
 
@@ -46,6 +49,6 @@ done
 echo $bt_channel
 echo "Binding rfcomm 0 to $bt_address/$bt_channel"
 sudo rfcomm bind 0 "$bt_address" "$bt_channel"
-echo "Tethering $1"
+echo "Tethering $1 (CTRl-C to finish)"
 trap ctrl_c SIGINT
 wvdial bluetooth
