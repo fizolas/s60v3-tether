@@ -5,7 +5,7 @@ Tethering means sharing the internet connection in your phone with your computer
 
 Put wvdial.conf in /etc and replace "data.provider.com" with the IP of your own internet provider (complete Username and Pasword, if needed)
 
-Put s60v3-tether script in ~/bin or some other directory in the path, and make it executable (chmod +x s60v3-tether)
+Put the s60v3-tether script in ~/bin or some other directory in the path, and make it executable (chmod +x s60v3-tether)
 
 Put yourself in the sudoers group: e.g. for user john: "usermod -aG sudo john" (for this to be effective you need to log out and log in again)
 
