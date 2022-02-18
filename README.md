@@ -9,7 +9,7 @@ Put yourself in the sudoers group: e.g. for user john: "usermod -aG sudo john" (
 
 Pair your phone with your computer; set the computer as "authorised" in the bluetooth menu of the phone
 
-Run "s60v3-tether phone_name" to tether the phone with bluetooth name "phone_name"
+Run "s60v3-tether phone_name" in a terminal to tether the phone with bluetooth name "phone_name"
 
 Ctrl-C stops the tethering session leaving the system consistent (both during dial-up channel search or during wvdial)
 
