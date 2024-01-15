@@ -1,11 +1,19 @@
 #!/bin/bash
 
+# Bluetooth tethering for s60v3 phones in Debian 12 (bookworm)
+
+rfc_channel=0 # choose rfcomm channel to be used
+              # (it must be the same as in /etc/wvdial.conf)
+devrfcomm="/dev/rfcomm$rfc_channel"
+
+echo "Using $devrfcomm"
+
 if [ $# -lt 1 ]; then 
     echo "Give as a parameter the bluetooth name of the (paired) phone you wish to tether"; exit 
 fi
 
 function deactivate_bt() {
-    tmp=$(ls /dev/rfcomm1 2> /dev/null);
+    tmp=$(ls $devrfcomm 2> /dev/null);
     if [ -z "$tmp" ]; then
 	echo "Deactivating bluetooth"
 	sudo rfkill block bluetooth
@@ -13,8 +21,8 @@ function deactivate_bt() {
 }
 
 function ctrl_c() {
-    echo "Releasing rfcomm 0"
-    sudo rfcomm release 0 
+    echo "Releasing $devrfcomm"
+    sudo rfcomm release $rfc_channel
     echo "Restarting NetworkManager"
     sudo service NetworkManager start
     deactivate_bt
@@ -30,13 +38,19 @@ function ctrl_c0() {
 }
 
 
-echo "Stopping NetworkManager"
-sudo service NetworkManager stop
 echo -n "Getting bluetooth address of $1: "
-tmp=$(bluetoothctl paired-devices|grep $1)
+#tmp=$(bluetoothctl paired-devices|grep $1)
+tmp=$(bluetoothctl devices Paired|grep $1)
 tmp=${tmp#Device }
+if [ "$tmp" == "" ]
+then 
+    echo "device not paired"
+    exit
+fi
 bt_address=${tmp%" $1"}
 echo $bt_address
+echo "Stopping NetworkManager"
+sudo service NetworkManager stop
 trap ctrl_c0 SIGINT
 echo "Activating bluetooth"
 sudo rfkill unblock bluetooth 
@@ -47,8 +61,8 @@ while [ "$bt_channel" == "" ]; do
     bt_channel=${tmp#*: } 
 done
 echo $bt_channel
-echo "Binding rfcomm 0 to $bt_address/$bt_channel"
-sudo rfcomm bind 0 "$bt_address" "$bt_channel"
+echo "Binding rfcomm $rfc_channel to $bt_address/$bt_channel"
+sudo rfcomm bind "$rfc_channel" "$bt_address" "$bt_channel"
 echo "Tethering $1 (CTRl-C to finish)"
 trap ctrl_c SIGINT
-wvdial bluetooth
+sudo wvdial bluetooth

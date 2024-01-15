@@ -1,9 +1,9 @@
 # s60v3-tether
-Bluetooth tethering of s60v3 phones in Debian 11 (Bullseye)
+Bluetooth tethering of s60v3 phones in Debian 12 (Bookworm)
 
 Tethering means sharing the internet connection in your phone with your computer 
 
-Put wvdial.conf in /etc and replace "data.provider.com" with the IP of your own internet provider (complete Username and Pasword, if needed)
+Put wvdial.conf in /etc, or include it into an existing /etc/wvdial.conf, and replace "data.provider.com" with the IP of your own internet provider (complete Username and Pasword, if needed)
 
 Put the s60v3-tether script in ~/bin or some other directory in the path, and make it executable (chmod +x s60v3-tether)
 
